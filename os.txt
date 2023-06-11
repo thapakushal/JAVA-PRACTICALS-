@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct process {
+  int id;
+  int priority;
+  int burst_time;
+};
+
+void print_processes(struct process *processes, int n) {
+  for (int i = 0; i < n; i++) {
+    printf("Process %d: id=%d, priority=%d, burst_time=%d\n", i, processes[i].id, processes[i].priority, processes[i].burst_time);
+  }
+}
+
+void simulate_multi_level_queue_scheduling(struct process *processes, int n) {
+  // Create two queues, one for system processes and one for user processes.
+  struct process *system_processes = malloc(sizeof(struct process) * n);
+  struct process *user_processes = malloc(sizeof(struct process) * n);
+
+  // Populate the queues.
+  for (int i = 0; i < n; i++) {
+    if (processes[i].priority == 1) {
+      system_processes[i] = processes[i];
+    } else {
+      user_processes[i] = processes[i];
+    }
+  }
+
+  // Simulate the scheduling algorithm.
+  int system_process_index = 0;
+  int user_process_index = 0;
+  while (system_process_index < n || user_process_index < n) {
+    // If there are any system processes ready to run, run the highest priority one.
+    if (system_process_index < n && system_processes[system_process_index].priority > 0) {
+      // Run the process.
+      system_processes[system_process_index].burst_time--;
+
+      // If the process has finished, print its statistics.
+      if (system_processes[system_process_index].burst_time == 0) {
+        printf("System process %d: finished\n", system_processes[system_process_index].id);
+        system_process_index++;
+      }
+    } else {
+      // If there are any user processes ready to run, run the highest priority one.
+      if (user_process_index < n && user_processes[user_process_index].priority > 0) {
+        // Run the process.
+        user_processes[user_process_index].burst_time--;
+
+        // If the process has finished, print its statistics.
+        if (user_processes[user_process_index].burst_time == 0) {
+          printf("User process %d: finished\n", user_processes[user_process_index].id);
+          user_process_index++;
+        }
+      }
+    }
+  }
+}
+
+int main() {
+  // Create an array of processes.
+  int n;
+  scanf("%d", &n);
+  struct process processes[n];
+  for (int i = 0; i < n; i++) {
+    scanf("%d %d %d", &processes[i].id, &processes[i].priority, &processes[i].burst_time);
+  }
+
+  // Print the processes.
+  print_processes(processes, n);
+
+  // Simulate the scheduling algorithm.
+  simulate_multi_level_queue_scheduling(processes, n);
+
+  return 0;
+}
